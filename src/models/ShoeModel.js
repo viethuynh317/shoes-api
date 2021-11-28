@@ -1,51 +1,63 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 const shoeSchema = Schema({
   typeId: {
-    type: Number,
-    ref: 'ShoeType'
+    type: String,
+    ref: "ShoeType",
+  },
+  brand: {
+    type: String,
   },
   name: {
     type: String,
-    required: true
+    required: true,
+  },
+  gender: {
+    type: String,
+  },
+  colorway: {
+    type: String,
   },
   imageUrl: {
     type: String,
-    required: true
+    required: true,
   },
   unitPrice: {
     type: Number,
-    required: true
+    required: true,
   },
   discountOff: {
     type: Number,
   },
   description: {
-    type: String
+    type: String,
   },
   discountMaximum: {
-    type: Number
+    type: Number,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   numOfStars: {
-    type: Number
+    type: Number,
   },
   numOfFeedbacks: {
-    type: Number
+    type: Number,
   },
-  confirmed: {
+  slug: {
+    type: String,
+  },
+  isConfirmed: {
     type: Boolean,
     required: true,
-    default: false
-  }
+    default: false,
+  },
 });
 
-shoeSchema.index({ name: 'text'});
-export const Shoe = model('Shoe', shoeSchema, 'Shoe')
+shoeSchema.index({ name: "text" });
+export const Shoe = model("Shoe", shoeSchema, "Shoe");
