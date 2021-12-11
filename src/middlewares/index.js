@@ -1,6 +1,12 @@
-import { defaultMiddleware } from "./defaultMiddleware"
-import { jwtMiddleware } from "./authMiddleware"
-export { 
+import { defaultMiddleware } from "./defaultMiddleware";
+import { errorHandleMiddleware } from "./errorHandleMiddleware";
+import { validateRequestBody } from "./validateDataMiddleware";
+import { validatePermission } from "./validatePermissionMiddleware";
+import { jwtMiddleware } from "./authMiddleware";
+export {
   defaultMiddleware,
-  jwtMiddleware
-}
+  errorHandleMiddleware,
+  validateRequestBody,
+  validatePermission,
+  jwtMiddleware,
+};

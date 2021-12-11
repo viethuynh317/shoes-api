@@ -4,7 +4,7 @@ const cartItemSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  foodId: {
+  shoeId: {
     type: Schema.Types.ObjectId,
     required: true,
   },

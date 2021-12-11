@@ -1,7 +1,9 @@
-import { envVariables } from './env';
-import { dbConnection } from './dbConnection';
-import { Server } from './Server';
-import { upload, uploadSingle, deleteImage } from './cloudinary';
+import { envVariables } from "./env";
+import { dbConnection } from "./dbConnection";
+import { Server } from "./Server";
+import { upload, uploadSingle, deleteImage } from "./cloudinary";
+import { MySocket } from "./socketIo";
+import { geocoder } from "./googleMap";
 
 export {
   envVariables,
@@ -9,5 +11,7 @@ export {
   Server,
   upload,
   uploadSingle,
-  deleteImage
-}
+  deleteImage,
+  MySocket,
+  geocoder,
+};

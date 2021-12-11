@@ -4,6 +4,6 @@ const wishlistSchema = Schema({
     type: Schema.Types.ObjectId,
     require: true,
   },
-  foodIds: [{ type: Schema.Types.ObjectId }],
+  shoeIds: [{ type: Schema.Types.ObjectId }],
 });
 export const Wishlist = model("Wishlist", wishlistSchema, "Wishlist");
