@@ -4,7 +4,7 @@ const resetCodeSchema = Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  createAt: {
+  createdAt: {
     type: Date,
     required: true,
     default: Date.now,

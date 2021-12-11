@@ -8,14 +8,14 @@ const replySchema = Schema({
     type: String,
     required: true,
   },
-  createAt: {
+  createdAt: {
     type: Date,
     required: true,
     default: Date.now,
   },
 });
 const feedbackSchema = Schema({
-  foodId: {
+  shoeId: {
     type: Schema.Types.ObjectId,
     required: true,
   },
@@ -31,11 +31,11 @@ const feedbackSchema = Schema({
     type: String,
     required: true,
   },
-  createAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
-  updateAt: {
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

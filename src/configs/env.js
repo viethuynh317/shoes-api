@@ -5,7 +5,7 @@ export const envVariables = {
   connectString:
     process.env.CONNSTR ||
     "mongodb://localhost:27017/doantn?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false",
-  // jwtSecret: process.env.JWTSERCRET || "doanphanmem",
+  jwtSecret: process.env.JWTSERCRET || "doanphanmem",
   // googleClientId:
   //   process.env.clientId ||
   //   "40792845616-i0phd247ebg64f68q17f8vo055c9nk9r.apps.googleusercontent.com",

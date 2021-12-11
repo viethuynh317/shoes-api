@@ -13,7 +13,7 @@ const userSchema = new Schema({
     type: Number,
     required: true,
   },
-  createAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },

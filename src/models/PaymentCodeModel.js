@@ -8,7 +8,7 @@ const codeSchema = Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  updateAt: {
+  updatedAt: {
     type: Date,
     required: true,
     default: Date.now,

@@ -1,8 +1,8 @@
 {
-  "name": "SFood",
+  "name": "V-Shoes",
   "version": "0.1.0",
-  "description": "apiDoc SFood",
-  "title": "apiDoc SFood",
+  "description": "apiDoc V-Shoes",
+  "title": "apiDoc V-Shoes",
   "url": "http://127.0.0.1:3000",
   "useHostUrlAsSampleUrl": true,
   "sampleUrl": "http://127.0.0.1:3000",

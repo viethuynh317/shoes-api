@@ -16,12 +16,12 @@ const orderSchema = new Schema({
     type: Number,
     required: true,
   },
-  createAt: {
+  createdAt: {
     type: Date,
     required: true,
     default: Date.now,
   },
-  updateAt: {
+  updatedAt: {
     type: Date,
     required: true,
     default: Date.now,
