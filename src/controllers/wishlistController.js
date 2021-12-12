@@ -108,6 +108,10 @@ const updateWishlist = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { shoeId } = req.body;
+    const wishlist = await Wishlist.findOne({ userId });
+    if (!wishlist) {
+      await Wishlist.create({ userId });
+    }
     const item = await Wishlist.findOne({ userId, shoeIds: shoeId });
     if (item)
       await Wishlist.findByIdAndUpdate(item._id, {

@@ -15,31 +15,42 @@ const {
   updateStatus,
   getListOrderByStatus,
   momoPayment,
+  momoPaymentConfirm,
 } = orderController;
 const { validateCreateOrder, validateCreatePurchase } = validateRequestBody;
 const baseUrl = "/api/v1/orders";
 export const orderRoute = Router();
-orderRoute.use(`${baseUrl}`, jwtMiddleware);
 orderRoute
   .route(`${baseUrl}`)
-  .post(validateCreateOrder, checkPermission("ORDER", "Create"), order);
+  .post(
+    jwtMiddleware,
+    validateCreateOrder,
+    checkPermission("ORDER", "Create"),
+    order
+  );
 orderRoute
   .route(`${baseUrl}/purchase`)
-  .post(validateCreatePurchase, checkPermission("ORDER", "Create"), purchase);
+  .post(
+    jwtMiddleware,
+    validateCreatePurchase,
+    checkPermission("ORDER", "Create"),
+    purchase
+  );
 // orderRoute.route(``);
-orderRoute.route(`${baseUrl}/payment`).post(momoPayment);
+orderRoute.route(`${baseUrl}/payment`).post(jwtMiddleware, momoPayment);
+orderRoute.route(`${baseUrl}/payment-confirm`).post(momoPaymentConfirm);
 orderRoute
   .route(`${baseUrl}`)
-  .get(checkPermission("ORDER", "View"), getListOrder);
+  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrder);
 orderRoute
   .route(`${baseUrl}/:orderId`)
-  .get(checkPermission("ORDER", "View"), getOrderById);
+  .get(jwtMiddleware, checkPermission("ORDER", "View"), getOrderById);
 orderRoute
   .route(`${baseUrl}/:orderId`)
-  .delete(checkPermission("ORDER", "Delete"), cancelOrderById);
+  .delete(jwtMiddleware, checkPermission("ORDER", "Delete"), cancelOrderById);
 orderRoute
   .route(`${baseUrl}/:orderId/statuses`)
-  .put(checkPermission("ORDER", "Edit"), updateStatus);
+  .put(jwtMiddleware, checkPermission("ORDER", "Edit"), updateStatus);
 orderRoute
   .route(`${baseUrl}/statuses/:statusId`)
-  .get(checkPermission("ORDER", "View"), getListOrderByStatus);
+  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrderByStatus);

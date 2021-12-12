@@ -1,4 +1,4 @@
-import { Schema, model, Mongoose } from "mongoose";
+import { Schema, model } from "mongoose";
 const userSchema = new Schema({
   email: {
     type: String,
@@ -16,6 +16,10 @@ const userSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false,
   },
 });
 export const User = model("User", userSchema, "User");

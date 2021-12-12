@@ -7,12 +7,8 @@ const validateRegisterData = async (req, res, next) => {
     const role = await Role.findOne({ roleName: "customer" });
     const registerSchema = joi.object({
       email: joi.string().email().required(),
-      password: joi
-        .string()
-        .required()
-        .min(6)
-        .max(50)
-        .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
+      password: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
       roleId: joi.number().integer().required().valid(role.id),
       fullName: joi.string().required(),
       phoneNumber: joi.string().min(10).max(11).pattern(/[0-9]/),
@@ -29,6 +25,7 @@ const validateLoginData = (req, res, next) => {
     const loginSchema = joi.object({
       email: joi.string().email().required(),
       password: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
     });
     validateRequest(req, loginSchema, next);
   } catch (error) {
@@ -41,12 +38,8 @@ const validateEmployeeData = async (req, res, next) => {
     const role = await Role.findOne({ roleName: "employee" });
     const employeeSchema = joi.object({
       email: joi.string().email().required(),
-      password: joi
-        .string()
-        .required()
-        .min(6)
-        .max(50)
-        .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
+      password: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
       roleId: joi.number().integer().required().valid(role.id),
       fullName: joi.string().required(),
       phoneNumber: joi.string().min(10).max(11).pattern(/[0-9]/),
@@ -95,7 +88,7 @@ const validateNewShoeData = async (req, res, next) => {
     console.log(req.body);
     let shoeType = await ShoeType.find({});
     shoeType = shoeType.map((x) => x.id);
-    const shoeSchema = joi.object({
+    const foodSchema = joi.object({
       typeId: joi
         .number()
         .integer()
@@ -103,11 +96,11 @@ const validateNewShoeData = async (req, res, next) => {
         .valid(...shoeType),
       name: joi.string().max(256).min(1).required(),
       unitPrice: joi.number().integer().min(1000).required(),
-      discountOff: joi.number().min(0).max(1),
+      discountOff: joi.number().min(0).max(100),
       description: joi.string().max(1024),
       discountMaximum: joi.number().min(0).max(joi.ref("unitPrice")),
     });
-    validateRequest(req, shoeSchema, next);
+    validateRequest(req, foodSchema, next);
   } catch (error) {
     console.log(error);
     next(error);
@@ -117,12 +110,8 @@ const validateResetPasswordData = async (req, res, next) => {
   try {
     const resetPasswordSchema = joi.object({
       code: joi.string().length(8).required(),
-      newPassword: joi
-        .string()
-        .required()
-        .min(6)
-        .max(50)
-        .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
+      newPassword: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
       confirmPassword: joi.valid(joi.ref("newPassword")),
       email: joi.string().email().required(),
     });
@@ -135,18 +124,10 @@ const validateResetPasswordData = async (req, res, next) => {
 const validateChangePasswordData = async (req, res, next) => {
   try {
     const changePasswordSchema = joi.object({
-      oldPassword: joi
-        .string()
-        .required()
-        .min(6)
-        .max(50)
-        .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
-      newPassword: joi
-        .string()
-        .required()
-        .min(6)
-        .max(50)
-        .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
+      oldPassword: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
+      newPassword: joi.string().required().min(6).max(50),
+      // .regex(/(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*])(?=.{6,})/),
       confirmPassword: joi.valid(joi.ref("newPassword")),
     });
     validateRequest(req, changePasswordSchema, next);
@@ -189,6 +170,32 @@ const validateCreatePurchase = async (req, res, next) => {
     next(error);
   }
 };
+const validateFeedbackData = async (req, res, next) => {
+  try {
+    const feedbackSchema = joi.object({
+      numOfStars: joi.number().required().min(0).max(5),
+      content: joi.string().required(),
+      foodId: joi.string().required(),
+    });
+    validateRequest(req, feedbackSchema, next);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+const validateReplyData = async (req, res, next) => {
+  try {
+    console.log("body: ", req.body);
+    const replySchema = joi.object({
+      feedbackId: joi.string().required(),
+      content: joi.string().required(),
+    });
+    validateRequest(req, replySchema, next);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
 export const validateRequestBody = {
   validateRegisterData,
   validateLoginData,
@@ -200,4 +207,6 @@ export const validateRequestBody = {
   validateResetPasswordData,
   validateCreateOrder,
   validateCreatePurchase,
+  validateFeedbackData,
+  validateReplyData,
 };

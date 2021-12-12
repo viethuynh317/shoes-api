@@ -1,11 +1,11 @@
-import { Schema, model} from "mongoose";
+import { Schema, model } from "mongoose";
 const shipperSchema = Schema({
   userDetailId: {
     type: Schema.Types.ObjectId,
     required: true,
   },
   isIdle: {
-    type: Boolean,
+    type: Number,
     required: true,
     default: true,
   },

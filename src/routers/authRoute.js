@@ -15,6 +15,8 @@ const {
   resetPassword,
   changePassword,
   getRoleId,
+  getToken,
+  confirmEmail,
 } = authController;
 const baseUrl = "/api/v1/auth";
 export const authRoute = Router();
@@ -31,3 +33,5 @@ authRoute
   .route(`${baseUrl}/change-password`)
   .post(jwtMiddleware, validateChangePasswordData, changePassword);
 authRoute.route(`${baseUrl}/roleId`).get(jwtMiddleware, getRoleId);
+authRoute.route(`${baseUrl}/token`).post(getToken);
+authRoute.route(`${baseUrl}/confirm-email?`).get(confirmEmail);

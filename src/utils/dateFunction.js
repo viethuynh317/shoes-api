@@ -15,7 +15,11 @@ const getMonthsByquater = (quater) => {
 const getDaysByMonth = (month, year) => {
   return new Date(year, month, 0).getDate();
 };
+const getQuaterByMonth = (month) => {
+  return parseInt((month - 1) / 3);
+};
 export const dateFunction = {
   getMonthsByquater,
   getDaysByMonth,
+  getQuaterByMonth,
 };

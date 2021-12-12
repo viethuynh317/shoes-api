@@ -50,6 +50,8 @@ const createNewShoe = async (req, res, next) => {
       isConfirmed,
       slug: slugify(name),
     });
+    const io = MySocket.prototype.getInstance();
+    await io.emit("ListProduct", "Get list products");
     res.status(201).json({
       status: 201,
       msg: "Create new shoe successfully!",
@@ -135,6 +137,7 @@ const getShoeById = async (req, res, next) => {
     const result = await Promise.all([
       Shoe.findById(shoeId),
       Feedback.find({ shoeId: shoeId }).sort({ _id: "desc" }),
+      // Feedback.find({ shoeId: shoeId }).sort({ _id: "desc" }).limit(1),
     ]);
     const shoe = result[0];
     const feedbacks = result[1];
