@@ -1,13 +1,13 @@
 var Socket = require("socket.io");
 export class MySocket {
   constructor(server) {
-    this.socket = Socket(server.getServer(), {
-      core: {
+    MySocket.prototype.socket = Socket(server.getServer(), {
+      cors: {
         origin: "*",
       },
     });
   }
-  getInstance() {
-    return this.socket;
-  }
 }
+MySocket.prototype.getInstance = () => {
+  return MySocket.prototype.socket;
+};

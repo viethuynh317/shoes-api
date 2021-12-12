@@ -5,9 +5,6 @@ const orderSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  employeesId: {
-    type: Schema.Types.ObjectId,
-  },
   address: {
     type: String,
     required: true,

@@ -54,6 +54,7 @@ const getShippers = async (req, res, next) => {
         phoneNumber: x.userDetail[0].phoneNumber,
         address: x.userDetail[0].address,
         birthday: x.userDetail[0].birthday,
+        isIdle: x.isIdle,
       };
     });
     res.status(200).json({
@@ -94,7 +95,7 @@ const getShippers = async (req, res, next) => {
  */
 const createNewShipper = async (req, res, next) => {
   try {
-    const { fullName, phoneNumber, birthday, address } = req.body;
+    const { fullName, phoneNumber, birthday, address, isIdle } = req.body;
     const userDetail = await UserDetail.create({
       fullName,
       phoneNumber,
@@ -103,6 +104,7 @@ const createNewShipper = async (req, res, next) => {
     });
     await Shipper.create({
       userDetailId: userDetail._id,
+      isIdle,
     });
     res.status(201).json({
       status: 201,
@@ -141,15 +143,18 @@ const createNewShipper = async (req, res, next) => {
  */
 const updateShipper = async (req, res, next) => {
   try {
-    const shipperid = req.params.shipperId;
-    const { fullName, phoneNumber, birthday, address } = req.body;
-    const shipper = await Shipper.findById(shipperid);
+    const shipperId = req.params.shipperId;
+    const { fullName, phoneNumber, birthday, address, isIdle } = req.body;
+    const shipper = await Shipper.findById(shipperId);
     if (!shipper) throw createHttpError(404, "Not found shipper!");
     await UserDetail.findByIdAndUpdate(shipper.userDetailId, {
       fullName,
       phoneNumber,
       birthday,
       address,
+    });
+    await Shipper.findByIdAndUpdate(shipperId, {
+      isIdle,
     });
     res.status(200).json({
       status: 200,

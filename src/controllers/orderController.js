@@ -1,10 +1,10 @@
-import createHttpError from "http-errors";
-import Mongoose from "mongoose";
 import {
   getPaymentCode,
   confirmPaymentCode,
   distanceBetween2Points,
   getShipmentFee,
+  getHash,
+  getSignatue,
 } from "../utils";
 import {
   CartItem,
@@ -14,8 +14,12 @@ import {
   PaymentCode,
   Shipper,
 } from "../models";
-import { envVariables, geocoder } from "../configs";
-const { my_address, perPage, public_key } = envVariables;
+import { envVariables, geocoder, MySocket } from "../configs";
+import { contentSecurityPolicy } from "helmet";
+const { my_address, perPage, public_key, secret_key, partner_code } =
+  envVariables;
+const axios = require("axios").default;
+const { v1: uuidv1 } = require("uuid");
 /**
  * @api {get} /api/v1/orders Get list order by userId
  * @apiName Get list order
@@ -182,6 +186,16 @@ const getOrderById = async (req, res, next) => {
     });
     let status = await OrderStatus.findOne({ id: order[0].statusId });
     status = status.description;
+    const data = {
+      status: 200,
+      msg: "Get order successfully!",
+      _id: order[0]._id,
+      address: order[0].address,
+      total: order[0].total,
+      orderStatus: status,
+      createdAt: order[0].createdAt,
+      orderItems,
+    };
     res.status(200).json({
       status: 200,
       msg: "Get order successfully!",
@@ -360,6 +374,8 @@ const purchase = async (req, res, next) => {
     });
 
     await OrderItem.insertMany(orderItems);
+    const io = MySocket.prototype.getInstance();
+    io.emit("NewOrder", "Create new order success!");
     res.status(201).json({
       status: 201,
       msg: "Purchase successfully!",
@@ -470,7 +486,7 @@ const updateStatus = async (req, res, next) => {
     const user = req.user;
     const orderId = req.params.orderId;
     const order = await Order.findById(orderId);
-    const { code, shipperId } = req.body;
+    const { code, shipperId, statusId } = req.body;
     switch (order.statusId) {
       case 0:
         if (user.roleId != 2)
@@ -480,12 +496,34 @@ const updateStatus = async (req, res, next) => {
       case 1:
         if (user.roleId != 2)
           throw createHttpError(400, "You are not employee");
-        await shipOrderStatus(order, shipperId, res, next);
+        if (order.statusId < statusId) {
+          await shipOrderStatus(order, shipperId, res, next);
+        } else {
+          await Order.findByIdAndUpdate(order._id, {
+            statusId,
+          });
+          res.status(200).json({
+            status: 200,
+            msg: "Return back successfully!",
+          });
+        }
         break;
       case 2:
-        if (user.roleId != 1)
-          throw createHttpError(400, "You are not customer!");
-        await paidOrderStatus(order, code, res, next);
+        if (!statusId || order.statusId > statusId) {
+          if (user.roleId != 1)
+            throw createHttpError(400, "You are not customer!");
+          await paidOrderStatus(order, code, res, next);
+        } else {
+          if (user.roleId != 2)
+            throw createHttpError(400, "You are not employees!");
+          await Order.findByIdAndUpdate(order._id, {
+            statusId,
+          });
+          res.status(200).json({
+            status: 200,
+            msg: "Return back successfully!",
+          });
+        }
         break;
       case 3:
         if (user.roleId != 2)
@@ -516,6 +554,7 @@ const confirmOrderStatus = async (order, res, next) => {
 };
 const shipOrderStatus = async (order, shipperId, res, next) => {
   try {
+    if (!shipperId) throw createHttpError(400, "Please select shipper!");
     await getPaymentCode(order._id, next);
     await Order.findByIdAndUpdate(order._id, {
       statusId: 2,
@@ -540,7 +579,10 @@ const paidOrderStatus = async (order, code, res, next) => {
     }
     await Order.findByIdAndUpdate(order._id, {
       statusId: 3,
+      isPaid: true,
     });
+    const io = MySocket.prototype.getInstance();
+    io.emit("UpdateOrderStatus", 3);
     res.status(200).json({
       status: 200,
       msg: "Pay for order successfully!",
@@ -562,6 +604,8 @@ const confirmPaidOrderStatus = async (order, res, next) => {
         isIdle: true,
       }
     );
+    const io = MySocket.prototype.getInstance();
+    io.emit("UpdateStatistical");
     res.status(200).json({
       status: 200,
       msg: "Confirm paid order successfully!",
@@ -662,7 +706,8 @@ const getListOrderByStatus = async (req, res, next) => {
     console.log(typeof statusId, statusId);
     const user = req.user;
     let orders,
-      shippers = [];
+      shippers = [],
+      shipperDetails = [];
     if (user.roleId == 1) {
       orders = await Order.find({
         customerId: user._id,
@@ -678,10 +723,31 @@ const getListOrderByStatus = async (req, res, next) => {
           shipmentFee: x.shipmentFee,
           total: x.total,
           createdAt: x.createdAt,
+          isPaid: x.isPaid,
         };
       });
     } else {
-      if (statusId == 1) shippers = await Shipper.find({ isIdle: true });
+      if (statusId == 1) {
+        shippers = await Shipper.aggregate([
+          {
+            $lookup: {
+              from: "UserDetail",
+              localField: "userDetailId",
+              foreignField: "_id",
+              as: "shipperDetail",
+            },
+          },
+          {
+            $match: {
+              isIdle: true,
+            },
+          },
+        ]);
+        shippers = shippers.map((x) => ({
+          _id: x._id,
+          fullName: x.shipperDetail[0].fullName,
+        }));
+      }
       orders = await Order.aggregate([
         {
           $lookup: {
@@ -701,6 +767,24 @@ const getListOrderByStatus = async (req, res, next) => {
         return x._id;
       });
       const paymentCodes = await PaymentCode.find({ orderId: orderIds });
+      if (statusId == 2)
+        shipperDetails = await Shipper.aggregate([
+          {
+            $lookup: {
+              from: "UserDetail",
+              localField: "userDetailId",
+              foreignField: "_id",
+              as: "shipperDetail",
+            },
+          },
+          {
+            $match: {
+              orderId: {
+                $in: orderIds,
+              },
+            },
+          },
+        ]);
       console.log(paymentCodes);
       orders = orders.map((x) => {
         const index = orderIds.indexOf(x._id);
@@ -713,11 +797,20 @@ const getListOrderByStatus = async (req, res, next) => {
           shipmentFee: x.shipmentFee,
           total: x.total,
           createdAt: x.createdAt,
-          customerName: x.userDetail[0].fullName,
-          phoneNumber: x.userDetail[0].phoneNumber,
+          isPaid: x.isPaid,
+          customerName:
+            x.userDetail[0] != undefined ? x.userDetail[0].fullName : undefined,
+          phoneNumber:
+            x.userDetail[0] != undefined
+              ? x.userDetail[0].phoneNumber
+              : undefined,
           paymentCode:
             paymentCodes[index] != undefined
               ? paymentCodes[index].code
+              : undefined,
+          shipperName:
+            shipperDetails[index] != undefined
+              ? shipperDetails[index].shipperDetail[0].fullName
               : undefined,
         };
       });
@@ -737,10 +830,9 @@ const getListOrderByStatus = async (req, res, next) => {
 const momoPayment = async (req, res, next) => {
   try {
     console.log("Body: ", req.body);
-    const {
+    let {
       partnerCode,
       partnerRefId,
-      partnerTransId,
       amount,
       customerNumber,
       appData,
@@ -748,8 +840,80 @@ const momoPayment = async (req, res, next) => {
       payType,
       orderId,
     } = req.body;
+    version = parseFloat(version);
+    payType = parseInt(payType);
+    amount = parseInt(amount);
+    const hashData = { partnerCode, partnerRefId, amount };
+    console.log(typeof hashData);
+    const hash = getHash(public_key, hashData);
+    console.log(hash);
+    const bodyData = {
+      partnerCode: partner_code,
+      partnerRefId,
+      customerNumber,
+      appData,
+      hash,
+      version,
+      payType,
+    };
+    console.log("Data: ", bodyData);
+    var { data } = await axios.post(
+      "https://test-payment.momo.vn/pay/app",
+      bodyData
+    );
+    console.log(data);
+    if (data.status != 0) throw createHttpError(400, data.message);
+    await Order.findByIdAndUpdate(orderId, {
+      isPaid: true,
+    });
+    console.log("Orders: ", await Order.findById(orderId));
+    res.status(200).json({
+      status: 200,
+      msg: "Successful transaction!",
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+const momoPaymentConfirm = async (req, res, next) => {
+  try {
+    const { partnerCode, status, message, partnerRefId, momoTransId, amount } =
+      req.body;
+    let signatureData = {
+      amount,
+      message,
+      momoTransId,
+      partnerRefId,
+      status,
+    };
+    let signature = getSignatue(secret_key, signatureData);
+    console.log(signature);
+    res.status(200).json({
+      status,
+      message,
+      partnerRefId,
+      momoTransId,
+      amount,
+      signature,
+    });
 
-    const hashData = { partnerCode, partnerRefId };
+    signatureData = {
+      partnerCode: partner_code,
+      partnerRefId,
+      requestType: "capture",
+      requestId: uuidv1(),
+      momoTransId,
+    };
+    signature = getSignatue(secret_key, signatureData);
+    const { data } = await axios.post(
+      "https://test-payment.momo.vn/pay/confirm",
+      {
+        ...signatureData,
+        signature,
+      }
+    );
+    console.log(data);
   } catch (error) {
     console.log(error);
     next(error);
@@ -764,4 +928,5 @@ export const orderController = {
   updateStatus,
   getListOrderByStatus,
   momoPayment,
+  momoPaymentConfirm,
 };

@@ -1,4 +1,4 @@
-import { envVariables, Server, dbConnection } from "./configs";
+import { envVariables, Server, dbConnection, MySocket } from "./configs";
 import { defaultMiddleware } from "./middlewares/defaultMiddleware";
 import { errorHandleMiddleware } from "./middlewares/errorHandleMiddleware";
 import {
@@ -17,9 +17,13 @@ const { port, connectString } = envVariables;
 
 const main = async () => {
   const server = new Server(port);
+  new MySocket(server);
+  const io = MySocket.prototype.getInstance();
+  io.on("connection", (socket) => {
+    console.log("New client connect!");
+  });
 
   server.registerMiddleware(defaultMiddleware);
-
   server.listen();
   dbConnection(connectString);
   server.registerRouter(shoeRoute);

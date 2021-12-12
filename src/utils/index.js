@@ -10,6 +10,7 @@ import {
 import { sendEmail } from "./sendMail";
 import { distanceBetween2Points, getShipmentFee } from "./shipment";
 import { dateFunction } from "./dateFunction";
+import { getHash, getSignatue } from "./encryptData";
 // import { uploadMultiData } from "./uploadMultiData";
 export {
   validateRequest,
@@ -25,5 +26,7 @@ export {
   getShipmentFee,
   distanceBetween2Points,
   dateFunction,
+  getHash,
+  getSignatue,
   // uploadMultiData,
 };

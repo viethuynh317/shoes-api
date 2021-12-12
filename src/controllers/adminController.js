@@ -11,13 +11,20 @@ import {
   Order,
 } from "../models";
 import Mongoose from "mongoose";
-import { modifyPermissionsEffected, dateFunction } from "../utils";
+import {
+  modifyPermissionsEffected,
+  dateFunction,
+  confirmResetCode,
+  getResetCode,
+  sendEmail,
+} from "../utils";
+import { envVariables } from "../configs";
 const {
   initPermissions,
   addPermissionsForUserEffected,
   delPermissionsForUserEffected,
 } = modifyPermissionsEffected;
-const { getDaysByMonth, getMonthsByquater } = dateFunction;
+const { getDaysByMonth, getMonthsByquater, getQuaterByMonth } = dateFunction;
 //--------------------Managing employees---------------------------//
 
 /**
@@ -80,6 +87,7 @@ const getListEmployees = async (req, res, next) => {
         phoneNumber: x.userDetail[0].phoneNumber,
         birthday: x.userDetail[0].birthday,
         address: x.userDetail[0].address,
+        isConfirmed: x.isConfirmed,
       };
     });
     res.status(200).json({
@@ -147,6 +155,15 @@ const createNewEmployee = async (req, res, next) => {
       address,
     });
     await initPermissions(roleId, newUser._id);
+    const code = await getResetCode(newUser._id, next);
+    const link = `${envVariables.send_mail_path}/api/v1/auth/confirm-email?code=${code}&&userId=${newUser._id}`;
+    await sendEmail(
+      email,
+      "Confirm Email",
+      "Please click link bellow to confirm email!\n" + link,
+      "",
+      next
+    );
     res.status(201).json({
       status: 201,
       msg: "Create a new employee successfully!",
@@ -219,6 +236,7 @@ const getEmpployeeById = async (req, res, next) => {
         phoneNumber: employee[0].userDetail[0].phoneNumber,
         fullName: employee[0].userDetail[0].fullName,
         birthday: employee[0].userDetail[0].birthday,
+        isConfirmed: employee[0].isConfirmed,
       },
     });
   } catch (error) {
@@ -313,7 +331,9 @@ const deleteEmployeeById = async (req, res, next) => {
       User.findByIdAndDelete(employeeId),
       UserDetail.findOneAndDelete({ userId: employeeId }),
     ]);
-    console.log(JSON.stringify(employee));
+    let delPermissions = await UserPermission.find({ userId: employeeId });
+    delPermissions = delPermissions.map((x) => x.permissionId);
+    await delPermissionsForUserEffected(delPermissions, 2);
     if (!employee) {
       throw createHttpError(400, "An employee is not exist!");
     }
@@ -586,7 +606,7 @@ const getAllUsers = async (req, res, next) => {
       {
         $match: {
           roleId: {
-            $ne: [0],
+            $ne: 0,
           },
         },
       },
@@ -789,6 +809,7 @@ const updatePermissionsByUserId = async (req, res, next) => {
       })
     );
     await UserPermission.deleteMany({
+      userId,
       permissionId: listDelPermissions,
     });
     res.status(200).json({
@@ -930,25 +951,45 @@ const getRevenuesByDate = async (req, res, next) => {
     let startDate, endDate;
     try {
       if (!date) throw createHttpError(400, "Day is undefied!");
-      endDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
-      startDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
+      // endDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
+      // startDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
+      endDate = new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000);
+      startDate = new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000);
+      console.log("Get revenue by day: " + startDate + ":" + endDate);
     } catch (error) {
-      endDate = new Date(Date.now());
-      startDate = new Date(Date.now());
-      console.log(endDate);
+      console.log("Now: " + Date.now);
+      var today = new Date(Date.now() + 7 * 60 * 60 * 1000);
+      endDate = new Date(
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        ).getTime()
+      );
+      startDate = new Date(
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        ).getTime() -
+          7 * 60 * 60 * 1000
+      );
+      console.log("Get revenue by day1: " + startDate + ":" + endDate);
     }
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
+    startDate.setHours(17, 0, 0, 0);
+    endDate.setHours(16, 59, 59, 999);
+    console.log("Get revenue by day2: " + startDate + ":" + endDate);
     let orders = await Order.find({
-      updatedAt: {
+      updateAt: {
         $gte: startDate,
         $lt: endDate,
       },
       statusId: 4,
     });
     orders = orders.map((x) => {
+      var mHour = new Date(x.updateAt).getHours() + 7;
       return {
-        hour: new Date(x.updatedAt).getHours(),
+        hour: mHour > 24 ? mHour - 24 : mHour,
         revenue: x.total,
       };
     });
@@ -1001,7 +1042,8 @@ const getRevenuesByDate = async (req, res, next) => {
 
 const getRevenuesByQuater = async (req, res, next) => {
   try {
-    let quater = req.query.quater || 1;
+    let quater =
+      req.query.quater || getQuaterByMonth(new Date(Date.now()).getMonth()) + 1;
     let year = req.query.year || new Date(Date.now()).getFullYear();
     quater = Number(quater);
     year = Number(year);
@@ -1071,7 +1113,7 @@ const getRevenuesByQuater = async (req, res, next) => {
 const getRevenueByMonth = async (req, res, next) => {
   try {
     console.log(req.query);
-    let month = req.query.month || 1;
+    let month = req.query.month || new Date(Date.now()).getMonth() + 1;
     let year = req.query.year || new Date(Date.now()).getFullYear();
     month = Number(month);
     year = Number(year);
