@@ -10,10 +10,10 @@ const { getProfile, updateProfile, updateAvatar } = profileController;
 export const profileRoute = Router();
 profileRoute.use(`${baseUrl}`, jwtMiddleware);
 profileRoute
-  .route(`${baseUrl}/userId`)
+  .route(`${baseUrl}/userId/:id`)
   .get(checkPermission("USER_PROFILE", "View"), getProfile);
 profileRoute
-  .route(`${baseUrl}/userId`)
+  .route(`${baseUrl}/userId/:id`)
   .put(
     checkPermission("USER_PROFILE", "Edit"),
     validateProfileData,

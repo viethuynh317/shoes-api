@@ -30,7 +30,7 @@ authRoute
   .route(`${baseUrl}/new-password`)
   .post(validateResetPasswordData, resetPassword);
 authRoute
-  .route(`${baseUrl}/change-password`)
+  .route(`${baseUrl}/change-password/:id`)
   .post(jwtMiddleware, validateChangePasswordData, changePassword);
 authRoute.route(`${baseUrl}/roleId`).get(jwtMiddleware, getRoleId);
 authRoute.route(`${baseUrl}/token`).post(getToken);

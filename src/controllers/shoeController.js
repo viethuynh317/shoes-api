@@ -42,16 +42,16 @@ const createNewShoe = async (req, res, next) => {
       name,
       gender,
       colorway,
-      unitPrice,
-      imageUrl: image.url || "abc",
-      discountOff,
+      unitPrice: unitPrice || 0,
+      imageUrl: image.url || "image",
+      discountOff: discountOff || 0,
       description,
-      discountMaximum,
-      isConfirmed,
+      discountMaximum: discountMaximum || 0,
+      isConfirmed: isConfirmed || false,
       slug: slugify(name),
     });
-    const io = MySocket.prototype.getInstance();
-    await io.emit("ListProduct", "Get list products");
+    // const io = MySocket.prototype.getInstance();
+    // await io.emit("ListProduct", "Get list products");
     res.status(201).json({
       status: 201,
       msg: "Create new shoe successfully!",

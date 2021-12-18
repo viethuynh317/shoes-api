@@ -37,7 +37,7 @@ import { User, UserDetail } from "../models";
  */
 const getProfile = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.id;
     console.log("userId: " + userId);
     const user = await User.aggregate([
       {
@@ -109,7 +109,7 @@ const getProfile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { fullName, phoneNumber, birthday, address } = req.body;
-    const userId = req.user._id;
+    const userId = req.params.id;
     console.log("userId :", userId);
     const user = await User.findOne({ _id: userId });
     console.log("User: ", user);
