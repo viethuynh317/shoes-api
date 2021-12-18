@@ -324,7 +324,7 @@ const resetPassword = async (req, res, next) => {
  */
 const changePassword = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.params.id);
     const { oldPassword, newPassword, confirmPassword } = req.body;
     const match = await bcrypt.compare(oldPassword, user.password);
     if (!match) throw createHttpError(400, "Old password is incorrect!");
