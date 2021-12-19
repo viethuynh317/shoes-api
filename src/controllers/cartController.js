@@ -36,7 +36,7 @@ import { CartItem } from "../models";
  */
 const getListCartItem = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.userId || req.user._id;
     // const cartItems = await CartItem.find({ customerId: userId });
     let cartItems = await CartItem.aggregate([
       {
@@ -110,12 +110,11 @@ const getListCartItem = async (req, res, next) => {
  */
 const createNewCartItem = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.userId || req.user._id;
     let { shoeId, quantity, cartItems } = req.body;
     if (!cartItems) {
       await addOneCartItem(userId, shoeId, quantity);
     } else {
-      cartItems = JSON.parse(cartItems);
       const keys = Object.keys(cartItems);
       for (const key of keys) {
         await addOneCartItem(userId, key, cartItems[key]);
@@ -262,7 +261,7 @@ const deleteCartItem = async (req, res, next) => {
 };
 const deleteAllCartItem = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.userId || req.user._id;
     await CartItem.remove({ customerId: userId });
     res.status(200).json({
       status: 200,
