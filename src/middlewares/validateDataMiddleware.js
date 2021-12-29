@@ -88,7 +88,7 @@ const validateNewShoeData = async (req, res, next) => {
     console.log(req.body);
     let shoeType = await ShoeType.find({});
     shoeType = shoeType.map((x) => x.id);
-    const foodSchema = joi.object({
+    const shoeSchema = joi.object({
       typeId: joi
         .number()
         .integer()
@@ -100,7 +100,7 @@ const validateNewShoeData = async (req, res, next) => {
       description: joi.string().max(1024),
       discountMaximum: joi.number().min(0).max(joi.ref("unitPrice")),
     });
-    validateRequest(req, foodSchema, next);
+    validateRequest(req, shoeSchema, next);
   } catch (error) {
     console.log(error);
     next(error);
@@ -175,7 +175,7 @@ const validateFeedbackData = async (req, res, next) => {
     const feedbackSchema = joi.object({
       numOfStars: joi.number().required().min(0).max(5),
       content: joi.string().required(),
-      foodId: joi.string().required(),
+      shoeId: joi.string().required(),
     });
     validateRequest(req, feedbackSchema, next);
   } catch (error) {

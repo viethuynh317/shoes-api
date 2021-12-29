@@ -10,7 +10,7 @@ import { Wishlist } from "../models";
  * @apiSuccess {Number} status <code> 200 </code>
  * @apiSuccess {String} msg <code>Get wishlist successfully!</code> if everything went fine.
  * @apiSuccess {ObjectId} _id The Id of wishlist
- * @apiSuccess {Array} wishlist the Array foods of wishlist
+ * @apiSuccess {Array} wishlist the Array shoes of wishlist
  * @apiSuccessExample {json} Success-Example
  *     HTTP/1.1 200 OK
  *     {
@@ -85,7 +85,7 @@ const getWishlist = async (req, res, next) => {
  * @api {put} /api/v1/wishlist Update wishlist of customer (add or delete item)
  * @apiName Update wishlist of customer (add or delete item)
  * @apiGroup Wishlist
- * @apiParam {String} foodId The id of food
+ * @apiParam {String} shoeId The id of shoe
  * @apiHeader {String} Authorization The token can be generated from your user profile.
  * @apiHeaderExample {Header} Header-Example
  *      "Authorization: Bearer AAA.BBB.CCC"
@@ -132,7 +132,7 @@ const updateWishlist = async (req, res, next) => {
   }
 };
 /**
- * @api {delete} /api/v1/wishlist/:foodId Delete an item of wishlist
+ * @api {delete} /api/v1/wishlist/:shoeId Delete an item of wishlist
  * @apiName Delete an item of wishlist
  * @apiGroup Wishlist
  * @apiHeader {String} Authorization The token can be generated from your user profile.
