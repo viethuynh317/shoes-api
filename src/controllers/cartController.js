@@ -19,7 +19,7 @@ import { CartItem } from "../models";
  *         "cartItems": [
  *            {
  *            "_id": "607d3e2a8ce6ab317096a869",
- *            "foodId": "6076c317ebb733360805137a",
+ *            "shoeId": "6076c317ebb733360805137a",
  *            "quantity": 4,
  *            "name": "Orange juice",
  *            "unitPrice": 40000,
@@ -79,8 +79,8 @@ const getListCartItem = async (req, res, next) => {
  * @api {post} /api/v1/carts Add cart item
  * @apiName Add cart item
  * @apiGroup Cart
- * @apiParam {ObjectId} foodId food's Id required when add one item
- * @apiParam {int} quantity quantity food required when add one Item
+ * @apiParam {ObjectId} shoeId shoe's Id required when add one item
+ * @apiParam {int} quantity quantity shoe required when add one Item
  * @apiParam {Object} cartItems key-_itemId, value-quantity
  * @apiParamExample {json} Param example
  * {

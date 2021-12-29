@@ -834,21 +834,21 @@ const validatePermissionInRole = async (roleId, listPermissions) => {
   }
 };
 /**
- * @api {get} /api/v1/admin/foods Get list of food to confirm
- * @apiName Get list of food to confirm
+ * @api {get} /api/v1/admin/shoes Get list of shoe to confirm
+ * @apiName Get list of shoe to confirm
  * @apiGroup Admin
  * @apiHeader {String} Authorization The token can be generated from your user profile.
  * @apiHeaderExample {Header} Header-Example
  *      "Authorization: Bearer AAA.BBB.CCC"
  * @apiSuccess {Number} status <code> 200 </code>
- * @apiSuccess {String} msg <code>Get list food successfully</code>
- * @apiSuccess {Array} foods <code> Array foods which need confirming </code>
+ * @apiSuccess {String} msg <code>Get list shoe successfully</code>
+ * @apiSuccess {Array} shoes <code> Array shoes which need confirming </code>
  * @apiSuccessExample {json} Success-Example
  *     HTTP/1.1 200 OK
  *     {
  *         status: 200,
- *         msg: "Get list food successfully!",
- *         "foods": [
+ *         msg: "Get list shoe successfully!",
+ *         "shoes": [
  *             {
  *                 "confirmed": false,
  *                 "_id": "607d81b6e141e742289e2ecf",
@@ -882,8 +882,8 @@ const getListShoeConfirm = async (req, res, next) => {
   }
 };
 /**
- * @api {post} /api/v1/admin/foods/:foodId Confirm food when create new one
- * @apiName Confirm food when create new one
+ * @api {post} /api/v1/admin/shoes/:shoeId Confirm shoe when create new one
+ * @apiName Confirm shoe when create new one
  * @apiGroup Admin
  * @apiHeader {String} Authorization The token can be generated from your user profile.
  * @apiHeaderExample {Header} Header-Example

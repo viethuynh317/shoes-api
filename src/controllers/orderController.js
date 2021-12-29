@@ -114,7 +114,7 @@ const getListOrder = async (req, res, next) => {
  *                  {
  *                      "_id": "607ee38d5061c506d4604112",
  *                      "quantity": 4,
- *                      "foodId": "6076c317ebb733360805137a",
+ *                      "shoeId": "6076c317ebb733360805137a",
  *                      "name": "Orange juice",
  *                      "unitPrice": 40000,
  *                      "discountOff": 20
@@ -122,7 +122,7 @@ const getListOrder = async (req, res, next) => {
  *                  {
  *                      "_id": "607ee38d5061c506d4604113",
  *                      "quantity": 3,
- *                      "foodId": "607d81b6e141e742289e2ecf",
+ *                      "shoeId": "607d81b6e141e742289e2ecf",
  *                      "name": "Gà sốt me",
  *                      "unitPrice": 50000
  *                  }

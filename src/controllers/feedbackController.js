@@ -162,8 +162,14 @@ const reply = async (req, res, next) => {
 const getAllFeedbacks = async (req, res, next) => {
   try {
     const { shoeId } = req.params;
-    let feedbacks = await Feedback.find({ shoeId });
-    console.log(feedbacks);
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage) || 5;
+    const start = (page - 1) * perPage;
+    let feedbacks = await Feedback.find({ shoeId })
+      .skip(start)
+      .limit(perPage)
+      .sort({ createdAt: -1 });
+
     feedbacks = feedbacks.map((x) => {
       return {
         _id: x._id,

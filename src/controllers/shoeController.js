@@ -74,6 +74,8 @@ const getShoeList = async (req, res, next) => {
       discountOff,
       unitPrice,
       isConfirmed,
+      orderBy,
+      rangePrice,
     } = req.query;
 
     const findQuery = {
@@ -104,10 +106,33 @@ const getShoeList = async (req, res, next) => {
       findQuery.$and.push({ isConfirmed });
     }
 
+    if (!isNil(rangePrice)) {
+      findQuery.$and.push({
+        unitPrice: {
+          $gte: +rangePrice[0],
+          $lte: +rangePrice[1],
+        },
+      });
+    }
+
     //Sort query
     if (!isNil(numOfStars)) sortQuery.numOfStars = numOfStars;
     if (+unitPrice !== 0 && !isNil(unitPrice)) sortQuery.unitPrice = unitPrice;
     if (!isNil(discountOff)) sortQuery.discountOff = discountOff;
+    if (!isNil(orderBy)) {
+      if (orderBy === "inc") {
+        sortQuery.unitPrice = 1;
+      }
+      if (orderBy === "desc") {
+        sortQuery.unitPrice = -1;
+      }
+      if (orderBy === "rating") {
+        sortQuery.numOfStars = -1;
+      }
+      if (orderBy === "sale") {
+        sortQuery.discountOff = -1;
+      }
+    }
 
     const page = Number(req.query.page) || 1;
     const perPage = Number(req.query.perPage) || 5;
