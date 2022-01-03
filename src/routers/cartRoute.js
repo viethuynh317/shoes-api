@@ -11,9 +11,9 @@ const {
 } = cartController;
 const baseUrl = "/api/v1/carts";
 export const cartRoute = Router();
-cartRoute.use(`${baseUrl}/:userId`, jwtMiddleware);
-cartRoute.route(`${baseUrl}/:userId`).get(getListCartItem);
-cartRoute.route(`${baseUrl}/:userId`).post(createNewCartItem);
+cartRoute.use(`${baseUrl}`, jwtMiddleware);
+cartRoute.route(`${baseUrl}`).get(getListCartItem);
+cartRoute.route(`${baseUrl}`).post(createNewCartItem);
 cartRoute.route(`${baseUrl}`).put(updateCartItem);
 cartRoute.route(`${baseUrl}`).delete(deleteCartItem);
 // cartRoute

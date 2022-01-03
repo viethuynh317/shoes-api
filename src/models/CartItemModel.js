@@ -1,12 +1,11 @@
-import { string } from "joi";
 import { Schema, model } from "mongoose";
-const cartItemSchema = new Schema({
+const cartItemSchema = Schema({
   customerId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   shoeId: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   quantity: {
