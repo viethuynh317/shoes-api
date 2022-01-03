@@ -1,5 +1,5 @@
 import Mongoose from "mongoose";
-import { Wishlist } from "../models";
+import { Shoe, Wishlist } from "../models";
 /**
  * @api {get} /api/v1/wishlist Get wishlist of customer
  * @apiName Get wishlist of customer
@@ -53,7 +53,10 @@ import { Wishlist } from "../models";
 const getWishlist = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    let wishlist = await Wishlist.aggregate([
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage) || 5;
+    const skip = (page - 1) * perPage;
+    let total = await Wishlist.aggregate([
       {
         $match: {
           userId: Mongoose.Types.ObjectId(userId),
@@ -68,6 +71,24 @@ const getWishlist = async (req, res, next) => {
         },
       },
     ]);
+    total = total[0].shoes.length;
+    let wishlist = await Wishlist.aggregate([
+      {
+        $match: {
+          userId: Mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "Shoe",
+          localField: "shoeIds",
+          foreignField: "_id",
+          as: "shoes",
+        },
+      },
+    ])
+      .skip(skip)
+      .limit(perPage);
     const _id = wishlist[0]._id;
     wishlist = wishlist[0].shoes;
     res.status(200).json({
@@ -75,6 +96,7 @@ const getWishlist = async (req, res, next) => {
       msg: "Get wishlist successfully!",
       _id,
       wishlist,
+      total,
     });
   } catch (error) {
     console.log(error);
@@ -109,19 +131,19 @@ const updateWishlist = async (req, res, next) => {
     const userId = req.user._id;
     const { shoeId } = req.body;
     const wishlist = await Wishlist.findOne({ userId });
+    // const shoe = await Shoe.findById(shoeId);
+    // const newShoe = { ...shoe.toJSON(), isWishlist: true };
     if (!wishlist) {
       await Wishlist.create({ userId });
     }
     const item = await Wishlist.findOne({ userId, shoeIds: shoeId });
-    if (item)
-      await Wishlist.findByIdAndUpdate(item._id, {
-        $pull: { shoeIds: shoeId },
-      });
-    else
-      await Wishlist.findOneAndUpdate(
-        { userId },
-        { $push: { shoeIds: shoeId } }
-      );
+    // if (item)
+    //   await Wishlist.findByIdAndUpdate(item._id, {
+    //     $pull: { shoeIds: shoeId },
+    //   });
+    // else
+    await Wishlist.findOneAndUpdate({ userId }, { $push: { shoeIds: shoeId } });
+
     res.status(200).json({
       status: 200,
       msg: "Update wishlist successfully!",
@@ -155,8 +177,8 @@ const updateWishlist = async (req, res, next) => {
  */
 const deleteItemFromWishlist = async (req, res, next) => {
   try {
-    const shoeId = req.params.shoeId;
     const userId = req.user._id;
+    const shoeId = req.params.shoeId;
     await Wishlist.findOneAndUpdate(
       { userId },
       {

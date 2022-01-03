@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const orderItemSchema = new Schema({
+const orderItemSchema = Schema({
   orderId: {
     type: Schema.Types.ObjectId,
     required: true,

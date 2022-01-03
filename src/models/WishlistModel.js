@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 const wishlistSchema = Schema({
   userId: {
     type: Schema.Types.ObjectId,
-    require: true,
+    required: true,
   },
   shoeIds: [{ type: Schema.Types.ObjectId }],
 });

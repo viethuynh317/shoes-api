@@ -1,6 +1,6 @@
 import { string } from "joi";
 import { Schema, model } from "mongoose";
-const orderSchema = new Schema({
+const orderSchema = Schema({
   customerId: {
     type: Schema.Types.ObjectId,
     required: true,

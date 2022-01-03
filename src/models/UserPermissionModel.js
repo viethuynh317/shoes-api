@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const userPermissionSchema = new Schema({
+const userPermissionSchema = Schema({
   userId: {
     type: Schema.Types.ObjectId,
     required: true,

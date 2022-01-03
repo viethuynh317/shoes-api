@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const permissionSchema = new Schema({
+const permissionSchema = Schema({
   name: {
     type: String,
     required: true,

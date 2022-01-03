@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const orderStatusSchema = new Schema(
+const orderStatusSchema = Schema(
   {
     id: {
       type: Number,

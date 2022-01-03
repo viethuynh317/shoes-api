@@ -36,9 +36,14 @@ import { CartItem } from "../models";
  */
 const getListCartItem = async (req, res, next) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const userId = req.user._id;
+    console.log(req.user);
     // const cartItems = await CartItem.find({ customerId: userId });
-    let cartItems = await CartItem.aggregate([
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage) || 5;
+    const skip = (page - 1) * perPage;
+
+    let cartItemsAll = await CartItem.aggregate([
       {
         $lookup: {
           from: "Shoe",
@@ -53,6 +58,34 @@ const getListCartItem = async (req, res, next) => {
         },
       },
     ]);
+
+    console.log(cartItemsAll, "hello1");
+    const total = cartItemsAll.reduce((result, cart) => {
+      return result + Number(cart.quantity);
+    }, 0);
+    const priceTotal = cartItemsAll.reduce(
+      (result, cart) => result + +cart.detail[0].unitPrice * +cart.quantity,
+      0
+    );
+
+    let cartItems = await CartItem.aggregate([
+      {
+        $match: {
+          customerId: Mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "Shoe",
+          localField: "shoeId",
+          foreignField: "_id",
+          as: "detail",
+        },
+      },
+    ])
+      .skip(skip)
+      .limit(perPage);
+
     console.log(cartItems[0]);
     cartItems = cartItems.map((x) => {
       return {
@@ -69,6 +102,8 @@ const getListCartItem = async (req, res, next) => {
       status: 200,
       msg: "Get cart item successfully!",
       cartItems,
+      total,
+      priceTotal,
     });
   } catch (error) {
     console.log(error);
@@ -110,7 +145,7 @@ const getListCartItem = async (req, res, next) => {
  */
 const createNewCartItem = async (req, res, next) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const userId = req.user._id;
     let { shoeId, quantity, cartItems } = req.body;
     if (!cartItems) {
       await addOneCartItem(userId, shoeId, quantity);
@@ -252,7 +287,7 @@ const deleteCartItem = async (req, res, next) => {
     }
     res.status(200).json({
       status: 200,
-      msg: "Delete cart itme successfully",
+      msg: "Delete cart item successfully",
     });
   } catch (error) {
     console.log(error);
@@ -261,7 +296,7 @@ const deleteCartItem = async (req, res, next) => {
 };
 const deleteAllCartItem = async (req, res, next) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const userId = req.user._id;
     await CartItem.remove({ customerId: userId });
     res.status(200).json({
       status: 200,

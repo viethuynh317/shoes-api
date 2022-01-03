@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const userDetailSchema = new Schema({
+const userDetailSchema = Schema({
   userId: {
     type: Schema.Types.ObjectId,
   },
