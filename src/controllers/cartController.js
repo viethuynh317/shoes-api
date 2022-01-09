@@ -59,7 +59,6 @@ const getListCartItem = async (req, res, next) => {
       },
     ]);
 
-    console.log(cartItemsAll, "hello1");
     const total = cartItemsAll.reduce((result, cart) => {
       return result + Number(cart.quantity);
     }, 0);
@@ -96,6 +95,7 @@ const getListCartItem = async (req, res, next) => {
         unitPrice: x.detail[0].unitPrice,
         imageUrl: x.detail[0].imageUrl,
         discountOff: x.detail[0].discountOff,
+        numOfStars: x.detail[0].numOfStars,
       };
     });
     res.status(200).json({
@@ -221,14 +221,14 @@ const addOneCartItem = async (userId, shoeId, quantity) => {
 const updateCartItem = async (req, res, next) => {
   try {
     let { cartItems } = req.body;
-    cartItems = JSON.parse(cartItems);
+    console.log(cartItems, "hello123");
     const keys = Object.keys(cartItems);
     console.log(keys[0], typeof cartItems);
     const cartItem = await Promise.all(
       keys.map((x) => {
         console.log("_id: ", x);
         return CartItem.findByIdAndUpdate(x, {
-          quantity: cartItems[x],
+          quantity: +cartItems[x],
         });
       })
     );
@@ -275,12 +275,13 @@ const updateCartItem = async (req, res, next) => {
  */
 const deleteCartItem = async (req, res, next) => {
   try {
+    const userId = req.user._id;
     const { cartItems } = req.body;
-    console.log(cartItems);
-    const cartItem = await CartItem.deleteMany({
-      _id: {
-        $in: cartItems,
-      },
+    const { id } = req.params;
+    console.log(id, "hello");
+    const cartItem = await CartItem.findOneAndDelete({
+      customerId: userId,
+      shoeId: id,
     });
     if (!cartItem) {
       throw createHttpError(404, "Not found item");

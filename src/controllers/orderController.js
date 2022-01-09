@@ -374,8 +374,8 @@ const purchase = async (req, res, next) => {
     });
 
     await OrderItem.insertMany(orderItems);
-    const io = MySocket.prototype.getInstance();
-    io.emit("NewOrder", "Create new order success!");
+    // const io = MySocket.prototype.getInstance();
+    // io.emit("NewOrder", "Create new order success!");
     res.status(201).json({
       status: 201,
       msg: "Purchase successfully!",
@@ -565,7 +565,7 @@ const shipOrderStatus = async (order, shipperId, res, next) => {
     });
     res.status(200).json({
       status: 200,
-      msg: "Tranfer to ship purchase successfully!",
+      msg: "Transfer to ship purchase successfully!",
     });
   } catch (error) {
     console.log(error);
@@ -581,8 +581,8 @@ const paidOrderStatus = async (order, code, res, next) => {
       statusId: 3,
       isPaid: true,
     });
-    const io = MySocket.prototype.getInstance();
-    io.emit("UpdateOrderStatus", 3);
+    // const io = MySocket.prototype.getInstance();
+    // io.emit("UpdateOrderStatus", 3);
     res.status(200).json({
       status: 200,
       msg: "Pay for order successfully!",
@@ -604,8 +604,8 @@ const confirmPaidOrderStatus = async (order, res, next) => {
         isIdle: true,
       }
     );
-    const io = MySocket.prototype.getInstance();
-    io.emit("UpdateStatistical");
+    // const io = MySocket.prototype.getInstance();
+    // io.emit("UpdateStatistical");
     res.status(200).json({
       status: 200,
       msg: "Confirm paid order successfully!",

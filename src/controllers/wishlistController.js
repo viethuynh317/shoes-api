@@ -131,18 +131,34 @@ const updateWishlist = async (req, res, next) => {
     const userId = req.user._id;
     const { shoeId } = req.body;
     const wishlist = await Wishlist.findOne({ userId });
-    // const shoe = await Shoe.findById(shoeId);
-    // const newShoe = { ...shoe.toJSON(), isWishlist: true };
+
     if (!wishlist) {
       await Wishlist.create({ userId });
     }
     const item = await Wishlist.findOne({ userId, shoeIds: shoeId });
-    // if (item)
-    //   await Wishlist.findByIdAndUpdate(item._id, {
-    //     $pull: { shoeIds: shoeId },
-    //   });
-    // else
-    await Wishlist.findOneAndUpdate({ userId }, { $push: { shoeIds: shoeId } });
+    if (item) {
+      await Wishlist.findOneAndUpdate(
+        { userId },
+        {
+          $pull: { shoeIds: shoeId },
+        }
+      );
+      await Shoe.findByIdAndUpdate(
+        shoeId,
+        { isWishlist: false },
+        { upsert: true }
+      );
+    } else {
+      await Wishlist.findOneAndUpdate(
+        { userId },
+        { $push: { shoeIds: shoeId } }
+      );
+      await Shoe.findByIdAndUpdate(
+        shoeId,
+        { isWishlist: true },
+        { upsert: true }
+      );
+    }
 
     res.status(200).json({
       status: 200,
@@ -186,6 +202,11 @@ const deleteItemFromWishlist = async (req, res, next) => {
           shoeIds: shoeId,
         },
       }
+    );
+    await Shoe.findByIdAndUpdate(
+      shoeId,
+      { isWishlist: false },
+      { upsert: true }
     );
     res.status(200).json({
       status: 200,
