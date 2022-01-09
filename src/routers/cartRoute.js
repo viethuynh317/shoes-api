@@ -15,7 +15,7 @@ cartRoute.use(`${baseUrl}`, jwtMiddleware);
 cartRoute.route(`${baseUrl}`).get(getListCartItem);
 cartRoute.route(`${baseUrl}`).post(createNewCartItem);
 cartRoute.route(`${baseUrl}`).put(updateCartItem);
-cartRoute.route(`${baseUrl}`).delete(deleteCartItem);
+cartRoute.route(`${baseUrl}/:id`).delete(deleteCartItem);
 // cartRoute
 //   .route(`${baseUrl}/:userId`)
 //   .delete(checkPermission("CART_ITEM", "Delete"), deleteAllCartItem);

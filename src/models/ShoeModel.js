@@ -57,6 +57,11 @@ const shoeSchema = Schema({
     required: true,
     default: false,
   },
+  isWishlist: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 shoeSchema.index({ name: "text" });

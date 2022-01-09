@@ -8,4 +8,4 @@ const baseUrl = "/api/v1/wishlist";
 wishlistRoute.use(`${baseUrl}`, jwtMiddleware);
 wishlistRoute.route(`${baseUrl}`).get(getWishlist);
 wishlistRoute.route(`${baseUrl}`).put(updateWishlist);
-wishlistRoute.route(`${baseUrl}/shoeId`).delete(deleteItemFromWishlist);
+wishlistRoute.route(`${baseUrl}/:shoeId`).delete(deleteItemFromWishlist);
