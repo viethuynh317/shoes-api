@@ -104,7 +104,7 @@ const createNewShipper = async (req, res, next) => {
     });
     await Shipper.create({
       userDetailId: userDetail._id,
-      isIdle,
+      isIdle: !!isIdle,
     });
     res.status(201).json({
       status: 201,
@@ -154,7 +154,7 @@ const updateShipper = async (req, res, next) => {
       address,
     });
     await Shipper.findByIdAndUpdate(shipperId, {
-      isIdle,
+      isIdle: !!isIdle,
     });
     res.status(200).json({
       status: 200,

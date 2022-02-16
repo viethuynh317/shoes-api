@@ -39,6 +39,7 @@ const getProfile = async (req, res, next) => {
   try {
     const userId = req.params.id;
     console.log("userId: " + userId);
+    console.log(userId, "hello1234");
     const user = await User.aggregate([
       {
         $lookup: {
