@@ -221,7 +221,6 @@ const addOneCartItem = async (userId, shoeId, quantity) => {
 const updateCartItem = async (req, res, next) => {
   try {
     let { cartItems } = req.body;
-    console.log(cartItems, "hello123");
     const keys = Object.keys(cartItems);
     console.log(keys[0], typeof cartItems);
     const cartItem = await Promise.all(
@@ -278,7 +277,7 @@ const deleteCartItem = async (req, res, next) => {
     const userId = req.user._id;
     const { cartItems } = req.body;
     const { id } = req.params;
-    console.log(id, "hello");
+
     const cartItem = await CartItem.findOneAndDelete({
       customerId: userId,
       shoeId: id,

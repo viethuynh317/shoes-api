@@ -120,7 +120,6 @@ const registerCustomer = async (req, res, next) => {
  */
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log("hello", password);
 
   try {
     const userExisted = await User.findOne({ email });

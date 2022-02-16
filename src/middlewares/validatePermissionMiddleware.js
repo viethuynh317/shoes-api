@@ -35,9 +35,7 @@ const checkPermission = (perName, perAction) => async (req, res, next) => {
       // userId: user._id,
       permissionId: permission._id,
     });
-    console.log("permission: ", permission);
-    console.log("userId: ", user._id);
-    console.log(isExisted, "hello");
+
     if (!isExisted) {
       throw createHttpError(
         401,

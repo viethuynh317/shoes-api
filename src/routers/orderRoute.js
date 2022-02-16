@@ -39,18 +39,12 @@ orderRoute
 // orderRoute.route(``);
 orderRoute.route(`${baseUrl}/payment`).post(jwtMiddleware, momoPayment);
 orderRoute.route(`${baseUrl}/payment-confirm`).post(momoPaymentConfirm);
-orderRoute
-  .route(`${baseUrl}`)
-  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrder);
-orderRoute
-  .route(`${baseUrl}/:orderId`)
-  .get(jwtMiddleware, checkPermission("ORDER", "View"), getOrderById);
-orderRoute
-  .route(`${baseUrl}/:orderId`)
-  .delete(jwtMiddleware, checkPermission("ORDER", "Delete"), cancelOrderById);
+orderRoute.route(`${baseUrl}`).get(jwtMiddleware, getListOrder);
+orderRoute.route(`${baseUrl}/:orderId`).get(jwtMiddleware, getOrderById);
+orderRoute.route(`${baseUrl}/:orderId`).delete(jwtMiddleware, cancelOrderById);
 orderRoute
   .route(`${baseUrl}/:orderId/statuses`)
-  .put(jwtMiddleware, checkPermission("ORDER", "Edit"), updateStatus);
+  .put(jwtMiddleware, updateStatus);
 orderRoute
   .route(`${baseUrl}/statuses/:statusId`)
-  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrderByStatus);
+  .get(jwtMiddleware, getListOrderByStatus);

@@ -5,7 +5,7 @@ const shipperSchema = Schema({
     required: true,
   },
   isIdle: {
-    type: Number,
+    type: Boolean,
     required: true,
     default: true,
   },
