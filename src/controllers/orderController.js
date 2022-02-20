@@ -1,3 +1,5 @@
+import createHttpError from "http-errors";
+import Mongoose from "mongoose";
 import {
   getPaymentCode,
   confirmPaymentCode,
@@ -185,14 +187,13 @@ const getOrderById = async (req, res, next) => {
       };
     });
     let status = await OrderStatus.findOne({ id: order[0].statusId });
-    status = status.description;
+
     const data = {
       status: 200,
       msg: "Get order successfully!",
       _id: order[0]._id,
       address: order[0].address,
       total: order[0].total,
-      orderStatus: status,
       createdAt: order[0].createdAt,
       orderItems,
     };
@@ -202,7 +203,6 @@ const getOrderById = async (req, res, next) => {
       _id: order[0]._id,
       address: order[0].address,
       total: order[0].total,
-      orderStatus: status,
       createdAt: order[0].createdAt,
       orderItems,
     });
@@ -422,16 +422,14 @@ const cancelOrderById = async (req, res, next) => {
   try {
     const orderId = req.params.orderId;
     const order = await Order.findById(orderId);
-    console.log(new Date(order.createdAt));
-    console.log(new Date(Date.now()));
     const duration = Date.now() - new Date(order.createdAt).getTime();
     console.log("duration: ", duration);
-    if (duration > 5 * 60 * 1000) {
-      throw createHttpError(
-        400,
-        "You can only cancel the order if don't over 5 minutes from ordering"
-      );
-    }
+    // if (duration > 5 * 60 * 1000) {
+    //   throw createHttpError(
+    //     400,
+    //     "You can only cancel the order if don't over 5 minutes from ordering"
+    //   );
+    // }
     await Order.findByIdAndRemove(orderId);
     res.status(200).json({
       status: 200,
@@ -487,15 +485,18 @@ const updateStatus = async (req, res, next) => {
     const orderId = req.params.orderId;
     const order = await Order.findById(orderId);
     const { code, shipperId, statusId } = req.body;
+
+    console.log("hello");
+
     switch (order.statusId) {
       case 0:
-        if (user.roleId != 2)
-          throw createHttpError(400, "You are not employee");
+        // if (user.roleId != 2)
+        //   throw createHttpError(400, "You are not employee");
         await confirmOrderStatus(order, res, next);
         break;
       case 1:
-        if (user.roleId != 2)
-          throw createHttpError(400, "You are not employee");
+        // if (user.roleId != 2)
+        //   throw createHttpError(400, "You are not employee");
         if (order.statusId < statusId) {
           await shipOrderStatus(order, shipperId, res, next);
         } else {
@@ -509,25 +510,11 @@ const updateStatus = async (req, res, next) => {
         }
         break;
       case 2:
-        if (!statusId || order.statusId > statusId) {
-          if (user.roleId != 1)
-            throw createHttpError(400, "You are not customer!");
-          await paidOrderStatus(order, code, res, next);
-        } else {
-          if (user.roleId != 2)
-            throw createHttpError(400, "You are not employees!");
-          await Order.findByIdAndUpdate(order._id, {
-            statusId,
-          });
-          res.status(200).json({
-            status: 200,
-            msg: "Return back successfully!",
-          });
-        }
+        await paidOrderStatus(order, code, res, next);
         break;
       case 3:
-        if (user.roleId != 2)
-          throw createHttpError(400, "You are not employee!");
+        // if (user.roleId != 2)
+        //   throw createHttpError(400, "You are not employee!");
         await confirmPaidOrderStatus(order, res, next);
         break;
       default:
@@ -574,9 +561,9 @@ const shipOrderStatus = async (order, shipperId, res, next) => {
 };
 const paidOrderStatus = async (order, code, res, next) => {
   try {
-    if (!(await confirmPaymentCode(code, order, next))) {
-      throw createHttpError(400, "Payment code is not valid!");
-    }
+    // if (!(await confirmPaymentCode(code, order, next))) {
+    //   throw createHttpError(400, "Payment code is not valid!");
+    // }
     await Order.findByIdAndUpdate(order._id, {
       statusId: 3,
       isPaid: true,
@@ -727,27 +714,25 @@ const getListOrderByStatus = async (req, res, next) => {
         };
       });
     } else {
-      if (statusId == 1) {
-        shippers = await Shipper.aggregate([
-          {
-            $lookup: {
-              from: "UserDetail",
-              localField: "userDetailId",
-              foreignField: "_id",
-              as: "shipperDetail",
-            },
+      shippers = await Shipper.aggregate([
+        {
+          $lookup: {
+            from: "UserDetail",
+            localField: "userDetailId",
+            foreignField: "_id",
+            as: "shipperDetail",
           },
-          {
-            $match: {
-              isIdle: true,
-            },
+        },
+        {
+          $match: {
+            isIdle: true,
           },
-        ]);
-        shippers = shippers.map((x) => ({
-          _id: x._id,
-          fullName: x.shipperDetail[0].fullName,
-        }));
-      }
+        },
+      ]);
+      shippers = shippers.map((x) => ({
+        _id: x._id,
+        fullName: x.shipperDetail[0].fullName,
+      }));
       orders = await Order.aggregate([
         {
           $lookup: {
