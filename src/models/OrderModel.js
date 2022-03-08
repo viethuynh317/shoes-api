@@ -38,5 +38,8 @@ const orderSchema = Schema({
     type: Number,
     required: true,
   },
+  isPaid: {
+    type: Boolean,
+  },
 });
 export const Order = model("Order", orderSchema, "Order");

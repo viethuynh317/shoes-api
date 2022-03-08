@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import Mongoose from "mongoose";
+import { MySocket } from "../configs";
 import { Feedback, Shoe, Reply, User, UserDetail } from "../models";
 /**
  * @api {post} /api/v1/feedbacks Add feebback
@@ -49,6 +50,8 @@ const addFeedback = async (req, res, next) => {
       content,
       numOfStars,
     });
+    const io = MySocket.prototype.getInstance();
+    io.emit("GetFeedbackById");
     res.status(200).json({
       status: 200,
       msg: "Create feedback successfully!",
@@ -95,6 +98,8 @@ const reply = async (req, res, next) => {
         reply: newReply,
       },
     });
+    const io = MySocket.prototype.getInstance();
+    io.emit("GetReplyById");
     res.status(200).json({
       status: 200,
       msg: "Reply success!",
@@ -173,7 +178,7 @@ const getAllFeedbacks = async (req, res, next) => {
     feedbacks = feedbacks.map((x) => {
       return {
         _id: x._id,
-        userId: req.user._id,
+        // userId: req.user._id,
         userName: x.userName,
         content: x.content,
         numOfStars: x.numOfStars,
@@ -181,6 +186,8 @@ const getAllFeedbacks = async (req, res, next) => {
         reply: x.reply,
       };
     });
+    // const io = MySocket.prototype.getInstance();
+    // io.emit("GetAllFeedback");
     res.status(200).json({
       status: 200,
       msg: "Get all feedbacks successfully!",
@@ -238,6 +245,8 @@ const getFeedbackById = async (req, res, next) => {
   try {
     const feedbackId = req.params.feedbackId;
     const feeback = await Feedback.findById(feedbackId);
+    // const io = MySocket.prototype.getInstance();
+    // io.emit("GetFeedbackById");
     res.status(200).json({
       status: 200,
       msg: "Get list reply successfully!",

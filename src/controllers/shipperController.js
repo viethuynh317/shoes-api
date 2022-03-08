@@ -1,4 +1,6 @@
 import createHttpError from "http-errors";
+import { Socket } from "socket.io";
+import { MySocket } from "../configs";
 import { Shipper, User, UserDetail } from "../models";
 /**
  * @api {get} /api/v1/shippers Get list shippers
@@ -106,6 +108,8 @@ const createNewShipper = async (req, res, next) => {
       userDetailId: userDetail._id,
       isIdle: !!isIdle,
     });
+    const io = MySocket.prototype.getInstance();
+    io.emit("CreateShipper");
     res.status(201).json({
       status: 201,
       msg: "Create new shipper successfully!",
@@ -156,6 +160,8 @@ const updateShipper = async (req, res, next) => {
     await Shipper.findByIdAndUpdate(shipperId, {
       isIdle: !!isIdle,
     });
+    const io = MySocket.prototype.getInstance();
+    io.emit("UpdateShipper");
     res.status(200).json({
       status: 200,
       msg: "Update shipper successfully!",
@@ -192,6 +198,10 @@ const deleteShipper = async (req, res, next) => {
     const shipperId = req.params.shipperId;
     const shipper = await Shipper.findByIdAndRemove(shipperId);
     if (!shipper) throw createHttpError(404, "Not found shipper!");
+
+    const io = MySocket.prototype.getInstance();
+    io.emit("DeleteShipper");
+
     res.status(200).json({
       status: 200,
       msg: "Delete shipper successfuly!",
