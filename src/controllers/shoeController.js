@@ -1,7 +1,7 @@
 import { Feedback, Shoe } from "../models";
 import { isNil, get } from "lodash";
 import slugify from "slugify";
-import { uploadSingle } from "../configs";
+import { MySocket, uploadSingle } from "../configs";
 const getAllShoeList = async (req, res, next) => {
   try {
     const shoeList = await Shoe.find({ isConfirmed: true });
@@ -50,8 +50,10 @@ const createNewShoe = async (req, res, next) => {
       isConfirmed: isConfirmed || false,
       slug: slugify(name),
     });
-    // const io = MySocket.prototype.getInstance();
-    // await io.emit("ListProduct", "Get list products");
+
+    const io = MySocket.prototype.getInstance();
+    io.emit("CreateShoe");
+
     res.status(201).json({
       status: 201,
       msg: "Create new shoe successfully!",
@@ -142,6 +144,7 @@ const getShoeList = async (req, res, next) => {
       .skip(start)
       .limit(perPage)
       .sort(sortQuery);
+
     res.status(200).json({
       status: 200,
       msg: "Get shoes successfully!",
@@ -166,6 +169,8 @@ const getShoeById = async (req, res, next) => {
     ]);
     const shoe = result[0];
     const feedbacks = result[1];
+    // const io = MySocket.prototype.getInstance();
+    // await io.emit("GetShoeById");
     res.status(200).json({
       status: 200,
       msg: "Get shoe successfully!",
@@ -223,6 +228,12 @@ const updateShoeById = async (req, res, next) => {
     if (!isNil(isConfirmed)) data.isConfirmed = isConfirmed;
 
     const newShoe = await Shoe.findByIdAndUpdate(shoeId, data);
+
+    const io = MySocket.prototype.getInstance();
+    io.emit("UpdateShoe");
+
+    console.log(typeId);
+
     res.status(200).json({
       status: 200,
       msg: "Update shoe successfully!",
@@ -242,6 +253,10 @@ const deleteShoeById = async (req, res, next) => {
       throw createHttpError(404, "Shoe is not found");
     }
     await Shoe.findByIdAndRemove(shoeId);
+
+    const io = MySocket.prototype.getInstance();
+    io.emit("DeleteShoe");
+
     res.status(200).json({
       status: 200,
       msg: "Delete shoe successfully!",
@@ -259,6 +274,10 @@ const confirmShoe = async (req, res, next) => {
       isConfirmed: true,
     });
     if (!shoe) throw createHttpError(400, "Not found shoe!");
+
+    const io = MySocket.prototype.getInstance();
+    io.emit("ConfirmShoe");
+
     res.status(200).json({
       status: 200,
       msg: "Confirm shoe successfully!",

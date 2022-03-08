@@ -953,12 +953,12 @@ const getRevenuesByDate = async (req, res, next) => {
       if (!date) throw createHttpError(400, "Day is undefied!");
       // endDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
       // startDate = new Date(new Date(date).getTime() - 7 * 60 * 60 * 1000);
-      endDate = new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000);
-      startDate = new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000);
+      endDate = new Date(new Date(date).getTime());
+      startDate = new Date(new Date(date).getTime());
       console.log("Get revenue by day: " + startDate + ":" + endDate);
     } catch (error) {
       console.log("Now: " + Date.now);
-      var today = new Date(Date.now() + 7 * 60 * 60 * 1000);
+      let today = new Date(Date.now());
       endDate = new Date(
         new Date(
           today.getFullYear(),
@@ -976,18 +976,18 @@ const getRevenuesByDate = async (req, res, next) => {
       );
       console.log("Get revenue by day1: " + startDate + ":" + endDate);
     }
-    startDate.setHours(17, 0, 0, 0);
-    endDate.setHours(16, 59, 59, 999);
+    startDate.setHours(24, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
     console.log("Get revenue by day2: " + startDate + ":" + endDate);
     let orders = await Order.find({
-      updateAt: {
+      updatedAt: {
         $gte: startDate,
         $lt: endDate,
       },
       statusId: 4,
     });
     orders = orders.map((x) => {
-      var mHour = new Date(x.updateAt).getHours() + 7;
+      let mHour = new Date(x.updatedAt).getHours();
       return {
         hour: mHour > 24 ? mHour - 24 : mHour,
         revenue: x.total,
@@ -1050,10 +1050,10 @@ const getRevenuesByQuater = async (req, res, next) => {
     const months = getMonthsByquater(quater);
     console.log(months);
     let startDate = new Date(year, months[0] - 1, 1);
-    let endDate = new Date(year, months[2] - 1, 0);
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
-    console.log(startDate, endDate);
+    let endDate = new Date(year, months[2], 1);
+    startDate.setHours(7, 0, 0, 0);
+    endDate.setHours(6, 59, 59, 999);
+    console.log(startDate, endDate, "hello");
     let orders = await Order.find({
       updatedAt: {
         $gte: startDate,
@@ -1118,9 +1118,9 @@ const getRevenueByMonth = async (req, res, next) => {
     month = Number(month);
     year = Number(year);
     let startDate = new Date(year, month - 1, 1);
-    let endDate = new Date(year, month, 0);
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
+    let endDate = new Date(year, month, 1);
+    startDate.setHours(7, 0, 0, 0);
+    endDate.setHours(6, 59, 59, 999);
     console.log(startDate, endDate);
     let orders = await Order.find({
       updatedAt: {
@@ -1183,9 +1183,9 @@ const getRevenuesByYear = async (req, res, next) => {
     let year = req.query.year || new Date(Date.now()).getFullYear();
     year = Number(year);
     let startDate = new Date(year, 0, 1);
-    let endDate = new Date(year, 11, 0);
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
+    let endDate = new Date(year, 12, 1);
+    startDate.setHours(7, 0, 0, 0);
+    endDate.setHours(6, 59, 59, 999);
     console.log(startDate, endDate);
     let orders = await Order.find({
       updatedAt: {
