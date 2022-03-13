@@ -12,10 +12,18 @@ const {
 const baseUrl = "/api/v1/carts";
 export const cartRoute = Router();
 cartRoute.use(`${baseUrl}`, jwtMiddleware);
-cartRoute.route(`${baseUrl}`).get(getListCartItem);
-cartRoute.route(`${baseUrl}`).post(createNewCartItem);
-cartRoute.route(`${baseUrl}`).put(updateCartItem);
-cartRoute.route(`${baseUrl}/:id`).delete(deleteCartItem);
+cartRoute
+  .route(`${baseUrl}`)
+  .get(checkPermission("CART", "View"), getListCartItem);
+cartRoute
+  .route(`${baseUrl}`)
+  .post(checkPermission("CART_ITEM", "Create"), createNewCartItem);
+cartRoute
+  .route(`${baseUrl}`)
+  .put(checkPermission("CART_ITEM", "Edit"), updateCartItem);
+cartRoute
+  .route(`${baseUrl}/:id`)
+  .delete(checkPermission("CART_ITEM", "Delete"), deleteCartItem);
 // cartRoute
 //   .route(`${baseUrl}/:userId`)
 //   .delete(checkPermission("CART_ITEM", "Delete"), deleteAllCartItem);
