@@ -87,8 +87,10 @@ const getWishlist = async (req, res, next) => {
         },
       },
     ])
+      .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(perPage);
+
     const _id = wishlist[0]._id;
     wishlist = wishlist[0].shoes;
     res.status(200).json({

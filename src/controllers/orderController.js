@@ -68,7 +68,9 @@ const { v1: uuidv1 } = require("uuid");
 const getListOrder = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const orders = await Order.find({ customerId: userId });
+    const orders = await Order.find({ customerId: userId }).sort({
+      updatedAt: -1,
+    });
     orders.map((x) => {
       return {
         _id: x._id,
@@ -375,9 +377,6 @@ const purchase = async (req, res, next) => {
 
     await OrderItem.insertMany(orderItems);
 
-    const io = MySocket.prototype.getInstance();
-    io.emit("NewOrder", "Create new order success!");
-
     res.status(201).json({
       status: 201,
       msg: "Purchase successfully!",
@@ -433,9 +432,6 @@ const cancelOrderById = async (req, res, next) => {
     //   );
     // }
     await Order.findByIdAndRemove(orderId);
-
-    const io = MySocket.prototype.getInstance();
-    io.emit("CancelOrder");
 
     res.status(200).json({
       status: 200,
@@ -526,9 +522,6 @@ const updateStatus = async (req, res, next) => {
       default:
         break;
     }
-
-    const io = MySocket.prototype.getInstance();
-    io.emit("UpdateOrder");
   } catch (error) {
     console.log(error);
     next(error);

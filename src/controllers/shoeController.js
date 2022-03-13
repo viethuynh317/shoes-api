@@ -84,7 +84,7 @@ const getShoeList = async (req, res, next) => {
       $and: [{}],
     };
 
-    const sortQuery = {};
+    const sortQuery = { updatedAt: -1 };
 
     //Find query
     if (search !== "" && !isNil(search)) {
@@ -229,9 +229,6 @@ const updateShoeById = async (req, res, next) => {
 
     const newShoe = await Shoe.findByIdAndUpdate(shoeId, data);
 
-    const io = MySocket.prototype.getInstance();
-    io.emit("UpdateShoe");
-
     console.log(typeId);
 
     res.status(200).json({
@@ -254,9 +251,6 @@ const deleteShoeById = async (req, res, next) => {
     }
     await Shoe.findByIdAndRemove(shoeId);
 
-    const io = MySocket.prototype.getInstance();
-    io.emit("DeleteShoe");
-
     res.status(200).json({
       status: 200,
       msg: "Delete shoe successfully!",
@@ -274,9 +268,6 @@ const confirmShoe = async (req, res, next) => {
       isConfirmed: true,
     });
     if (!shoe) throw createHttpError(400, "Not found shoe!");
-
-    const io = MySocket.prototype.getInstance();
-    io.emit("ConfirmShoe");
 
     res.status(200).json({
       status: 200,
