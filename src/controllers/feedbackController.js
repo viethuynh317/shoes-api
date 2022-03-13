@@ -173,7 +173,7 @@ const getAllFeedbacks = async (req, res, next) => {
     let feedbacks = await Feedback.find({ shoeId })
       .skip(start)
       .limit(perPage)
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
 
     feedbacks = feedbacks.map((x) => {
       return {
