@@ -438,7 +438,7 @@ const confirmEmail = async (req, res, next) => {
     if (confirmed) {
       res.send(
         `<h1>Your email is been Successfully verified </h1>
-        <a href=${login_path}/auth/sign_in>Please click here to go to Login page</a>`
+        <a href=${login_path}/auth/sign-in>Please click here to go to Login page</a>`
       );
     } else {
       res.send("<h1>Bad Request</h1>");
