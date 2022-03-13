@@ -32,7 +32,7 @@ const checkPermission = (perName, perAction) => async (req, res, next) => {
       action: perAction,
     });
     const isExisted = await UserPermission.findOne({
-      // userId: user._id,
+      userId: user._id,
       permissionId: permission._id,
     });
 
