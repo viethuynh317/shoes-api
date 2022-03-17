@@ -13,13 +13,7 @@ export const feedbackRoute = Router();
 const baseUrl = "/api/v1/feedbacks";
 // feedbackRoute.use(`${baseUrl}`, jwtMiddleware);
 feedbackRoute.route(`${baseUrl}`).get(checkPermission("FEEDBACK", "View"));
-feedbackRoute
-  .route(`${baseUrl}`)
-  .post(jwtMiddleware, checkPermission("FEEDBACK", "Create"), addFeedback);
-feedbackRoute
-  .route(`${baseUrl}/reply`)
-  .post(jwtMiddleware, checkPermission("FEEDBACK", "Create"), reply);
+feedbackRoute.route(`${baseUrl}`).post(jwtMiddleware, addFeedback);
+feedbackRoute.route(`${baseUrl}/reply`).post(jwtMiddleware, reply);
 feedbackRoute.route(`${baseUrl}/reply/:feedbackId`).get(getFeedbackById);
-feedbackRoute
-  .route(`${baseUrl}/:shoeId`)
-  .get(checkPermission("FEEDBACK", "View"), getAllFeedbacks);
+feedbackRoute.route(`${baseUrl}/:shoeId`).get(getAllFeedbacks);

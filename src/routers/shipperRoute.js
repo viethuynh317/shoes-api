@@ -7,15 +7,7 @@ const { getShippers, createNewShipper, updateShipper, deleteShipper } =
 const baseUrl = "/api/v1/shippers";
 export const shipperRoute = Router();
 shipperRoute.use(`${baseUrl}`, jwtMiddleware);
-shipperRoute
-  .route(`${baseUrl}`)
-  .get(checkPermission("SHIPPER", "View"), getShippers);
-shipperRoute
-  .route(`${baseUrl}`)
-  .post(checkPermission("SHIPPER", "Create"), createNewShipper);
-shipperRoute
-  .route(`${baseUrl}/:shipperId`)
-  .put(checkPermission("SHIPPER", "Edit"), updateShipper);
-shipperRoute
-  .route(`${baseUrl}/:shipperId`)
-  .delete(checkPermission("SHIPPER", "Delete"), deleteShipper);
+shipperRoute.route(`${baseUrl}`).get(getShippers);
+shipperRoute.route(`${baseUrl}`).post(createNewShipper);
+shipperRoute.route(`${baseUrl}/:shipperId`).put(updateShipper);
+shipperRoute.route(`${baseUrl}/:shipperId`).delete(deleteShipper);
