@@ -45,7 +45,7 @@ const getShippers = async (req, res, next) => {
           as: "userDetail",
         },
       },
-    ]).sort({ updatedAt: -1 });
+    ]);
     shippers = shippers.map((x) => {
       return {
         _id: x._id,

@@ -68,9 +68,7 @@ const { v1: uuidv1 } = require("uuid");
 const getListOrder = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const orders = await Order.find({ customerId: userId }).sort({
-      updatedAt: -1,
-    });
+    const orders = await Order.find({ customerId: userId });
     orders.map((x) => {
       return {
         _id: x._id,

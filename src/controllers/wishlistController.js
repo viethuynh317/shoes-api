@@ -87,7 +87,6 @@ const getWishlist = async (req, res, next) => {
         },
       },
     ])
-      .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(perPage);
 

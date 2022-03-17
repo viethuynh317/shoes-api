@@ -84,7 +84,7 @@ const getShoeList = async (req, res, next) => {
       $and: [{}],
     };
 
-    const sortQuery = { updatedAt: -1 };
+    const sortQuery = {};
 
     //Find query
     if (search !== "" && !isNil(search)) {

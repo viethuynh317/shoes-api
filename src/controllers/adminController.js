@@ -77,7 +77,7 @@ const getListEmployees = async (req, res, next) => {
           roleId: employeeRole.id,
         },
       },
-    ]).sort({ updatedAt: -1 });
+    ]);
     listEmployees = listEmployees.map((x) => {
       return {
         _id: x._id,
@@ -383,9 +383,7 @@ const deleteEmployeeById = async (req, res, next) => {
  */
 const getAllRoles = async (req, res, next) => {
   try {
-    const listRoles = await Role.find({ id: { $nin: [0] } }).sort({
-      updatedAt: -1,
-    });
+    const listRoles = await Role.find({ id: { $nin: [0] } });
     res.status(200).json({
       status: 200,
       msg: "Get list role successfully!",
@@ -615,7 +613,7 @@ const getAllUsers = async (req, res, next) => {
       {
         $project: { __v: 0, createdAt: 0, updatedAt: 0 },
       },
-    ]).sort({ updatedAt: -1 });
+    ]);
     listUsers = listUsers.map((x) => {
       return {
         _id: x._id,
