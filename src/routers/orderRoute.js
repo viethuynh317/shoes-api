@@ -1,11 +1,6 @@
 import { Router } from "express";
-import {
-  validatePermission,
-  jwtMiddleware,
-  validateRequestBody,
-} from "../middlewares";
+import { jwtMiddleware, validateRequestBody } from "../middlewares";
 import { orderController } from "../controllers";
-const { checkPermission } = validatePermission;
 const {
   getListOrder,
   getOrderById,
@@ -27,9 +22,7 @@ orderRoute
 // orderRoute.route(``);
 orderRoute.route(`${baseUrl}/payment`).post(jwtMiddleware, momoPayment);
 orderRoute.route(`${baseUrl}/payment-confirm`).post(momoPaymentConfirm);
-orderRoute
-  .route(`${baseUrl}`)
-  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrder);
+orderRoute.route(`${baseUrl}`).get(jwtMiddleware, getListOrder);
 orderRoute.route(`${baseUrl}/:orderId`).get(jwtMiddleware, getOrderById);
 orderRoute.route(`${baseUrl}/:orderId`).delete(jwtMiddleware, cancelOrderById);
 orderRoute
