@@ -27,7 +27,9 @@ orderRoute
 // orderRoute.route(``);
 orderRoute.route(`${baseUrl}/payment`).post(jwtMiddleware, momoPayment);
 orderRoute.route(`${baseUrl}/payment-confirm`).post(momoPaymentConfirm);
-orderRoute.route(`${baseUrl}`).get(jwtMiddleware, getListOrder);
+orderRoute
+  .route(`${baseUrl}`)
+  .get(jwtMiddleware, checkPermission("ORDER", "View"), getListOrder);
 orderRoute.route(`${baseUrl}/:orderId`).get(jwtMiddleware, getOrderById);
 orderRoute.route(`${baseUrl}/:orderId`).delete(jwtMiddleware, cancelOrderById);
 orderRoute

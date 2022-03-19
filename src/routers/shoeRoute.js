@@ -2,9 +2,11 @@ import { Router } from "express";
 import { shoeController } from "../controllers";
 import {
   // validateRequestBody,
-  // validatePermission,
+  validatePermission,
   jwtMiddleware,
 } from "../middlewares";
+
+const { checkPermission } = validatePermission;
 
 const {
   getShoeList,
@@ -17,8 +19,12 @@ const baseUrl = "/api/v1/shoes";
 
 export const shoeRoute = Router();
 // shoeRoute.use(`${baseUrl}`, jwtMiddleware);
-shoeRoute.route(baseUrl).get(getShoeList);
+shoeRoute.route(baseUrl).get(checkPermission("SHOE", "View"), getShoeList);
 shoeRoute.route(`${baseUrl}/:id`).get(getShoeById);
-shoeRoute.route(baseUrl).post(createNewShoe);
-shoeRoute.route(`${baseUrl}/:id`).patch(updateShoeById);
-shoeRoute.route(`${baseUrl}/:id`).delete(deleteShoeById);
+shoeRoute.route(baseUrl).post(checkPermission("SHOE", "Create"), createNewShoe);
+shoeRoute
+  .route(`${baseUrl}/:id`)
+  .patch(checkPermission("SHOE", "Edit"), updateShoeById);
+shoeRoute
+  .route(`${baseUrl}/:id`)
+  .delete(checkPermission("SHOE", "Delete"), deleteShoeById);
